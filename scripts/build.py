@@ -17,7 +17,7 @@ SHANGHAI = ZoneInfo("Asia/Shanghai")
 CATEGORIES = {
     "chrome": ("Chrome 插件", "chrome"),
     "video": ("视频工具", "video"),
-    "other": ("其他工具", "catalog"),
+    "other": ("其他项目", "catalog"),
 }
 
 
@@ -58,10 +58,11 @@ def latest_projects(repositories, settings):
         and not repo["archived"]
         and repo["name"].casefold() not in excluded
         and repo["pushed_at"]
+        and parse_timestamp(repo["created_at"]).astimezone(SHANGHAI).year == settings["year"]
     ]
     projects.sort(key=lambda repo: repo["name"].casefold())
     projects.sort(key=lambda repo: parse_timestamp(repo["pushed_at"]), reverse=True)
-    return projects[:settings["limit"]]
+    return projects
 
 
 def project_category(repo, override):
@@ -118,7 +119,7 @@ def project_card(repo, owner, overrides, featured):
           </div>
           {description_html}
           <div class="project-footer">
-            <div class="project-meta"><span>{category_label}</span>{label}<span>更新于 {time}</span></div>
+            <div class="project-meta"><span>{category_label}</span>{label}<span>GitHub 推送于 {time}</span></div>
             <div class="actions">
               {extra_link}
               <a class="card-link" href="{escape(github)}" aria-label="在 GitHub 查看 {escape(name)}">{github_label}</a>
@@ -135,7 +136,8 @@ def build(repositories, settings, refreshed_at):
     )
     template = (ROOT / "site" / "index.template.html").read_text(encoding="utf-8")
     page = (
-        template.replace("@@SYNC_ISO@@", refreshed_at.isoformat())
+        template.replace("@@YEAR@@", str(settings["year"]))
+        .replace("@@SYNC_ISO@@", refreshed_at.isoformat())
         .replace("@@SYNC_LOCAL@@", refreshed_at.astimezone(SHANGHAI).strftime("%Y-%m-%d %H:%M"))
         .replace("@@EMPTY_VISIBILITY@@", "hidden" if projects else "")
         .replace("@@PROJECT_CARDS@@", cards)
