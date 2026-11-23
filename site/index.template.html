@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Song 的项目工作台，展示 @@YEAR@@ 年创建的公开项目。">
+  <meta name="description" content="Song 的项目工作台，展示 @@YEAR@@ 年创建的项目。">
   <title>Song 的项目工作台</title>
   <style>
     :root {
@@ -157,6 +157,16 @@
       font-weight: 800;
       white-space: nowrap;
     }
+    .visibility {
+      padding: 1px 7px;
+      border: 1px solid var(--cream-line);
+      border-radius: 40px;
+      background: var(--cream);
+      color: var(--ink);
+      font-size: .77rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
     .project-description { margin: 14px 0 19px; color: var(--copy); }
     .project-footer { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 14px; width: 100%; margin-top: auto; }
     .project-meta { color: var(--muted); font-size: .82rem; font-weight: 620; }
@@ -221,7 +231,7 @@
       <h1>Song 的<span>项目工作台</span></h1>
       <div class="hero-accent" aria-hidden="true"></div>
       <div class="hero-bottom">
-        <p class="hero-description">@@YEAR@@ 年创建的公开项目，按最近推送排序。</p>
+        <p class="hero-description">@@YEAR@@ 年创建的项目，按最近推送排序。</p>
         <p class="refresh">数据刷新 <time datetime="@@SYNC_ISO@@">@@SYNC_LOCAL@@</time></p>
       </div>
     </header>

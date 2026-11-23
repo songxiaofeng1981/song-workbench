@@ -60,8 +60,21 @@ def latest_projects(repositories, settings):
         and repo["pushed_at"]
         and parse_timestamp(repo["created_at"]).astimezone(SHANGHAI).year == settings["year"]
     ]
+    known_names = {repo["name"].casefold() for repo in projects}
+    index = json.loads((ROOT / "data/approved-projects.json").read_text(encoding="utf-8"))
+    if index["year"] == settings["year"]:
+        for item in index["projects"]:
+            name = item["name"]
+            if name.casefold() not in known_names:
+                projects.append({"name": name, "private": True, "pushed_at": item["pushed_at"]})
+                known_names.add(name.casefold())
+
+    earliest = datetime.min.replace(tzinfo=timezone.utc)
     projects.sort(key=lambda repo: repo["name"].casefold())
-    projects.sort(key=lambda repo: parse_timestamp(repo["pushed_at"]), reverse=True)
+    projects.sort(
+        key=lambda repo: parse_timestamp(repo["pushed_at"]) if repo["pushed_at"] else earliest,
+        reverse=True,
+    )
     return projects
 
 
@@ -91,35 +104,40 @@ def project_card(repo, owner, overrides, featured):
     config = overrides.get(name, {})
     category = project_category(repo, config)
     category_label, glyph = CATEGORIES[category]
-    icon = project_icon(config.get("icon"), glyph)
-    description = config.get("description") or repo.get("description")
+    private = repo.get("private", False)
+    icon = project_icon(None if private else config.get("icon"), glyph)
+    description = None if private else (config.get("description") or repo.get("description"))
     description_html = f'<p class="project-description">{escape(description)}</p>' if description else ""
-    subtitle = config.get("label") or repo.get("language")
+    subtitle = None if private else (config.get("label") or repo.get("language"))
     label = f"<span>{escape(subtitle)}</span>" if subtitle else ""
 
-    pushed = parse_timestamp(repo["pushed_at"])
-    local_date = pushed.astimezone(SHANGHAI).date().isoformat()
-    time = f'<time datetime="{escape(pushed.isoformat())}">{local_date}</time>'
+    date_label = "尚无推送"
+    if repo["pushed_at"]:
+        pushed = parse_timestamp(repo["pushed_at"])
+        local_date = pushed.astimezone(SHANGHAI).date().isoformat()
+        date_label = f'GitHub 推送于 <time datetime="{escape(pushed.isoformat())}">{local_date}</time>'
     classes = "project featured" if featured else "project"
     badge = '<span class="badge">最新</span>' if featured else ""
 
     github = f"https://github.com/{quote(owner, safe='')}/{quote(name, safe='')}"
-    website = config.get("website")
+    website = None if private else config.get("website")
     extra_link = ""
     if website and urlsplit(website).scheme == "https" and urlsplit(website).netloc:
         extra_link = f'<a class="card-link" href="{escape(website)}" aria-label="打开 {escape(name)} 在线预览">在线预览</a>'
     github_label = "GitHub" if extra_link else "查看 GitHub"
+    visibility = '<span class="visibility">私有</span>' if private else ""
     return f'''        <article class="{classes}" data-category="{category}" aria-labelledby="project-{escape(name)}">
           <div class="card-head">
             {icon}
             <div class="heading-group">
               <h2 id="project-{escape(name)}">{escape(name)}</h2>
               {badge}
+              {visibility}
             </div>
           </div>
           {description_html}
           <div class="project-footer">
-            <div class="project-meta"><span>{category_label}</span>{label}<span>GitHub 推送于 {time}</span></div>
+            <div class="project-meta"><span>{category_label}</span>{label}<span>{date_label}</span></div>
             <div class="actions">
               {extra_link}
               <a class="card-link" href="{escape(github)}" aria-label="在 GitHub 查看 {escape(name)}">{github_label}</a>

@@ -1,7 +1,7 @@
 {
   "owner": "songxiaofeng1981",
   "year": 2026,
-  "exclude": ["songxiaofeng1981", "song-workbench"],
+  "exclude": ["songxiaofeng1981"],
   "projects": {
     "image-organizer": {
       "category": "chrome",
@@ -27,6 +27,7 @@
       "label": "macOS",
       "icon": "iphone-photos-chrome.png"
     },
+    "remotion-canvas-director": {"category": "video"},
     "stock-blog": {
       "category": "other",
       "description": "Song 的投资笔记，用 Hugo 搭建。"
