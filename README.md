@@ -10,6 +10,8 @@
 - [Pages 工作流](.github/workflows/pages.yml) 在北京时间周一至周五 09:13–17:13 每小时运行一次。在 Actions 中也可以手动运行。页面中的「数据刷新」记录最近一次成功发布所用的数据抓取时间。
 - [页面模板](site/index.template.html) 保存工作台布局和样式。脚本生成的静态页面由 GitHub Pages 托管。
 
+GitHub 会在公开仓库连续 60 天没有活动时停用定时任务。为维持小时刷新，若本仓库 45 天没有新提交，工作流会在成功发布后生成一条空提交。
+
 ## 本地查看
 
 运行 `python3 scripts/build.py`，然后打开生成的 `dist/index.html`。

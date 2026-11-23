@@ -16,12 +16,22 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    outputs:
+      stale: ${{ steps.activity.outputs.stale }}
     permissions:
       contents: read
     steps:
       - uses: actions/checkout@v6
         with:
           persist-credentials: false
+      - name: 检查定时任务的仓库活动
+        id: activity
+        if: github.event_name == 'schedule'
+        run: |
+          last_commit=$(git log -1 --format=%ct)
+          if [ "$(($(date +%s) - last_commit))" -ge 3888000 ]; then
+            echo "stale=true" >> "$GITHUB_OUTPUT"
+          fi
       - name: 获取公开项目并生成页面
         run: python3 scripts/build.py
         env:
@@ -44,3 +54,25 @@ jobs:
       - name: 发布到 GitHub Pages
         id: pages
         uses: actions/deploy-pages@v4
+
+  keep-schedule-active:
+    if: github.event_name == 'schedule' && needs.build.outputs.stale == 'true'
+    needs: [build, deploy]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: main
+      - name: 保持定时任务启用
+        run: |
+          last_commit=$(git log -1 --format=%ct)
+          if [ "$(($(date +%s) - last_commit))" -lt 3888000 ]; then
+            exit 0
+          fi
+          git -c user.name='github-actions[bot]' \
+              -c user.email='41898283+github-actions[bot]@users.noreply.github.com' \
+              commit --allow-empty -m "Keep the workbench schedule active"
+          git push origin HEAD:main
