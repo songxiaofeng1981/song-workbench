@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Song 的项目工作台，收录 Chrome 插件、视频工具和其他开发工具。">
+  <title>Song 的项目工作台</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #fff;
+      --cream: #fbf9f3;
+      --ink: #0e1b2e;
+      --copy: #394856;
+      --muted: #526174;
+      --green: #179a61;
+      --green-dark: #126943;
+      --orange: #ee792f;
+      --navy: #1c2d42;
+      --mint: #edf8f2;
+      --mint-deep: #e3f3eb;
+      --mint-soft: #f1f7f4;
+      --mint-line: #dcebe3;
+      --cream-line: #efeee9;
+      --sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+      --mono: ui-monospace, "SFMono-Regular", Consolas, monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font: 1rem/1.6 var(--sans); }
+    button { font: inherit; }
+    a { color: inherit; }
+    [hidden] { display: none !important; }
+    :focus-visible { outline: 3px solid var(--green-dark); outline-offset: 4px; }
+    .wrapper { width: min(100% - 80px, 1104px); margin-inline: auto; }
+    .hero {
+      margin-top: 44px;
+      padding: 37px 45px 38px;
+      border: 1px solid var(--cream-line);
+      border-radius: 25px;
+      background: var(--cream);
+    }
+    .hero-bar { display: flex; align-items: center; gap: 22px; }
+    .brand { color: var(--muted); font-size: .8rem; font-weight: 750; letter-spacing: .2em; }
+    .hero-line { flex: 1; height: 1px; background: #c9d0d8; }
+    .hero-lights { display: flex; gap: 9px; }
+    .hero-lights i { width: 9px; height: 9px; border-radius: 50%; background: var(--green); }
+    .hero-lights i:nth-child(2) { background: #23ae76; }
+    .hero-lights i:nth-child(3) { background: var(--orange); }
+    h1 {
+      margin: 19px 0 12px;
+      font-size: clamp(2.35rem, 5.7vw, 4.95rem);
+      letter-spacing: -.048em;
+      line-height: 1.12;
+      font-weight: 820;
+    }
+    h1 span { display: inline-block; margin-inline-start: .13em; color: var(--green); }
+    .hero-accent { width: min(172px, 45%); height: 6px; border-radius: 20px; background: linear-gradient(90deg, var(--green), var(--mint-deep)); }
+    .hero-bottom { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 6px 24px; margin-top: 18px; }
+    .hero-description { margin: 0; color: var(--copy); font-weight: 560; }
+    .refresh { margin: 0; color: var(--muted); font-size: .825rem; font-weight: 620; }
+    .empty { margin: 0; padding: 22px 24px; border: 1px solid var(--mint-line); border-radius: 14px; background: var(--mint-soft); color: var(--copy); }
+
+    .filters {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+      justify-content: space-between;
+      margin: 24px 0 22px;
+      padding-bottom: 13px;
+      border-bottom: 1px solid var(--mint-line);
+    }
+    .filter-buttons { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+    .filter {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      justify-content: center;
+      min-height: 43px;
+      padding: 7px 13px;
+      border: 1px solid transparent;
+      border-radius: 9px;
+      background: transparent;
+      color: var(--copy);
+      font-size: .9rem;
+      font-weight: 670;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: background .16s, border-color .16s, color .16s;
+    }
+    .filter:hover { background: var(--mint-soft); color: var(--green-dark); }
+    .filter[aria-pressed="true"] { background: var(--mint-deep); border-color: var(--mint-line); color: var(--green-dark); }
+    .count {
+      display: inline-grid;
+      place-items: center;
+      min-width: 20px;
+      height: 20px;
+      padding-inline: 5px;
+      border-radius: 50px;
+      background: #eaf0ed;
+      color: var(--muted);
+      font: 650 .75rem/1 var(--mono);
+    }
+    .filter[aria-pressed="true"] .count { background: var(--green-dark); color: var(--paper); }
+    .profile { color: var(--copy); font-size: .875rem; font-weight: 650; white-space: nowrap; text-underline-offset: 4px; }
+    .profile:hover { color: var(--green-dark); }
+
+    .projects { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    .project {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      min-width: 0;
+      min-height: 218px;
+      padding: 23px 25px 21px;
+      border: 1px solid var(--mint-line);
+      border-radius: 19px;
+      background: var(--mint-soft);
+    }
+    .project.featured {
+      grid-column: 1 / -1;
+      padding: 27px 29px 24px;
+      background: linear-gradient(120deg, var(--mint), var(--mint-deep));
+    }
+    .card-head { display: flex; align-items: center; gap: 12px; width: 100%; min-width: 0; }
+    .project-icon {
+      display: inline-grid;
+      flex: 0 0 auto;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      border: 1px solid var(--mint-line);
+      border-radius: 11px;
+      background: var(--paper);
+      object-fit: contain;
+      padding: 5px;
+    }
+    .featured .project-icon { width: 50px; height: 50px; border-radius: 13px; }
+    .glyph { position: relative; color: var(--green-dark); }
+    .glyph::before, .glyph::after { content: ""; position: absolute; }
+    .glyph-video::before { width: 22px; height: 16px; border: 2px solid currentColor; border-radius: 4px; }
+    .glyph-video::after { border-block: 4px solid transparent; border-left: 6px solid currentColor; transform: translateX(1px); }
+    .glyph-chrome::before { width: 20px; height: 20px; border: 2px solid currentColor; border-radius: 50%; }
+    .glyph-chrome::after { width: 7px; height: 7px; border: 2px solid currentColor; border-radius: 50%; }
+    .glyph-catalog::before { width: 20px; height: 20px; border: 2px solid currentColor; border-radius: 4px; }
+    .glyph-catalog::after { width: 10px; height: 9px; border-block: 2px solid currentColor; }
+    .heading-group { display: flex; flex-wrap: wrap; align-items: center; gap: 5px 11px; min-width: 0; }
+    .project h2 { margin: 0; font-size: 1.28rem; font-weight: 790; letter-spacing: -.026em; line-height: 1.22; overflow-wrap: anywhere; }
+    .featured h2 { font-size: clamp(1.45rem, 2.8vw, 2.15rem); }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 40px;
+      background: var(--orange);
+      color: var(--ink);
+      font-size: .77rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    .project-description { margin: 14px 0 19px; color: var(--copy); }
+    .project-footer { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 14px; width: 100%; margin-top: auto; }
+    .project-meta { color: var(--muted); font-size: .82rem; font-weight: 620; }
+    .project-meta span + span::before { content: "·"; margin-inline: 6px; }
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    .card-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 39px;
+      padding: 6px 12px;
+      border: 1px solid #d1e2d9;
+      border-radius: 8px;
+      color: var(--green-dark);
+      background: var(--paper);
+      font-size: .85rem;
+      font-weight: 730;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .card-link:hover { border-color: var(--green-dark); background: var(--mint); }
+    .featured .card-link { background: var(--green-dark); border-color: var(--green-dark); color: var(--paper); }
+    .featured .card-link:hover { background: var(--navy); border-color: var(--navy); }
+    main { padding-bottom: 36px; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+    @media (max-width: 750px) {
+      .wrapper { width: calc(100% - 38px); }
+      .hero { margin-top: 23px; padding: 26px 24px 28px; }
+      .project, .project.featured { padding-inline: 20px; }
+      .filters { align-items: flex-start; gap: 11px; }
+    }
+    @media (max-width: 570px) {
+      .wrapper { width: calc(100% - 32px); }
+      .hero { padding-inline: 19px; }
+      .hero-bar { gap: 10px; }
+      .hero-lights { gap: 6px; }
+      .hero-lights i { width: 7px; height: 7px; }
+      .brand { font-size: .71rem; }
+      h1 span { margin-inline-start: 0; }
+      .hero-description { text-wrap: pretty; }
+      .filters { margin-top: 17px; flex-direction: column; }
+      .filter-buttons { gap: 4px; }
+      .filter { padding-inline: 8px; }
+      .projects { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+      .project, .project.featured { min-height: 0; padding: 18px; }
+      .featured .project-icon { width: 44px; height: 44px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrapper">
+    <header class="hero">
+      <div class="hero-bar">
+        <span class="brand">SONG’S WORKBENCH</span>
+        <span class="hero-line" aria-hidden="true"></span>
+        <span class="hero-lights" aria-hidden="true"><i></i><i></i><i></i></span>
+      </div>
+      <h1>Song 的<span>项目工作台</span></h1>
+      <div class="hero-accent" aria-hidden="true"></div>
+      <div class="hero-bottom">
+        <p class="hero-description">Chrome 插件、视频模板和开发工具，按最近推送排序。</p>
+        <p class="refresh">数据刷新 <time datetime="@@SYNC_ISO@@">@@SYNC_LOCAL@@</time></p>
+      </div>
+    </header>
+
+    <section aria-label="项目目录">
+      <div class="filters">
+        <div class="filter-buttons" role="group" aria-label="按类别筛选项目" hidden>
+          <button class="filter" type="button" data-filter="all" aria-pressed="true" aria-controls="project-grid">全部项目 <span class="count"></span></button>
+          <button class="filter" type="button" data-filter="chrome" aria-pressed="false" aria-controls="project-grid">Chrome 插件 <span class="count"></span></button>
+          <button class="filter" type="button" data-filter="video" aria-pressed="false" aria-controls="project-grid">视频工具 <span class="count"></span></button>
+          <button class="filter" type="button" data-filter="other" aria-pressed="false" aria-controls="project-grid">其他工具 <span class="count"></span></button>
+        </div>
+        <a class="profile" href="https://github.com/songxiaofeng1981">GitHub 主页</a>
+      </div>
+      <p class="sr-only" id="filter-status" role="status" aria-atomic="true"></p>
+
+      <div class="projects" id="project-grid">
+@@PROJECT_CARDS@@
+      </div>
+      <p class="empty" id="empty-projects" @@EMPTY_VISIBILITY@@>这个分类暂无项目。</p>
+    </section>
+  </main>
+
+  <script>
+    const filters = document.querySelector('.filter-buttons');
+    const buttons = Array.from(filters.querySelectorAll('button'));
+    const projects = Array.from(document.querySelectorAll('.project'));
+    const status = document.getElementById('filter-status');
+    const empty = document.getElementById('empty-projects');
+
+    function matchesCategory(project, category) {
+      return category === 'all' || project.dataset.category === category;
+    }
+
+    for (const button of buttons) {
+      const category = button.dataset.filter;
+      button.querySelector('.count').textContent = projects.filter(project => matchesCategory(project, category)).length;
+      button.addEventListener('click', () => {
+        if (button.getAttribute('aria-pressed') === 'true') return;
+
+        for (const item of buttons) {
+          item.setAttribute('aria-pressed', String(item === button));
+        }
+
+        let visibleCount = 0;
+        for (const project of projects) {
+          project.hidden = !matchesCategory(project, category);
+          visibleCount += Number(!project.hidden);
+        }
+        empty.hidden = visibleCount > 0;
+        status.textContent = `显示 ${visibleCount} 个项目`;
+      });
+    }
+
+    filters.hidden = false;
+  </script>
+</body>
+</html>

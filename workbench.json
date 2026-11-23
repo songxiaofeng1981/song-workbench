@@ -1,0 +1,39 @@
+{
+  "owner": "songxiaofeng1981",
+  "limit": 5,
+  "exclude": ["songxiaofeng1981", "song-workbench"],
+  "projects": {
+    "image-organizer": {
+      "category": "chrome",
+      "description": "在 Chrome 里整理 Mac「下载」文件夹的图片，也能把网页图片直接存入自己的图库。",
+      "label": "macOS",
+      "icon": "image-organizer.png"
+    },
+    "html-manager": {
+      "category": "chrome",
+      "description": "给 Mac 上散落的 HTML 卡片、图表和笔记建一个能搜索的本地资料库。",
+      "label": "macOS",
+      "icon": "html-manager.png"
+    },
+    "video-kit": {
+      "category": "video",
+      "description": "用于竖屏口播的 Remotion 模板，把字幕、磨砂玻璃卡和数据动效排进一条视频。",
+      "label": "Remotion",
+      "website": "https://songxiaofeng1981.github.io/video-kit/"
+    },
+    "iphone-photos-chrome": {
+      "category": "chrome",
+      "description": "用数据线连接 iPhone，在 Chrome 里浏览照片，挑选后把原图存到 Mac。",
+      "label": "macOS",
+      "icon": "iphone-photos-chrome.png"
+    },
+    "stock-blog": {
+      "category": "other",
+      "description": "Song 的投资笔记，用 Hugo 搭建。"
+    },
+    "xueqiu-watchlist": {
+      "category": "other",
+      "description": "个人股票投研工作台。"
+    }
+  }
+}
